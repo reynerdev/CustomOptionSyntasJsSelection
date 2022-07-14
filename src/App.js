@@ -18,7 +18,7 @@ import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { theme } from "./theme";
 
 let path = "";
-let selected = false;
+
 const getPath = (target) => {
   if (target.previousSibling === null) {
     console.log("finalPath", path);
@@ -40,41 +40,14 @@ export default function App() {
   const [value, setValue] = React.useState({ path: "", value: "" });
   const wrapperRef = React.useRef(null);
 
-  React.useEffect(() => {
-    document.addEventListener("keydown", (event) => {
-      // console.log("document.event");
-      console.log(event.keyCode);
-      // let e = new Event("keydown");
-      // console.log(wrapperRef.current);
-      // wrapperRef.current.dispatchEvent(e);
-    });
-  }, []);
-
   const onMouseDown = React.useCallback((event) => {
-    // console.log("event", event.target.className);
-    // console.log("event", event.target.className.includes(""));
-    // console.log("event", event.target.className.split(" ")[0] === "");
-    // console.log("event", event.target.className.split(" ")[0]);
-    // console.log("event", event.target.className.split(" ")[0]);
-
-    // event.target.set(0, 2);
-
-    // let range = new Range();
-    // range.selectNodeContents(event.target);
-
-    // range.setStart(event.target, 0);
-    // range.setEnd(event.target.firstChild, 2);
-
-    // // apply the selection, explained later below
-
     const isEditable =
       !event.target.className.includes("property") &&
       !event.target.className.includes("string-property") &&
       !event.target.className.includes("punctuation") &&
       !event.target.className.includes("operator") &&
       !event.target.className.includes("linenumber") &&
-      !event.target.className.includes("prismjs"); //&&
-    // !event.target.className.split(" ")[0] === "";
+      !event.target.className.includes("prismjs");
     if (isEditable) {
       event.target.setAttribute("contentEditable", true);
     }
@@ -88,7 +61,6 @@ export default function App() {
       !event.target.className.includes("punctuation") &&
       !event.target.className.includes("operator")
     ) {
-      // console.log("setvalue");
       let val = event.target.innerText;
       getPath(event.target);
       setValue({ ...{ path: path, value: val } });
@@ -97,10 +69,7 @@ export default function App() {
   }, []);
 
   const onKeyDown = React.useCallback((event) => {
-    // event.preventDefault();
     event.stopPropagation();
-    // console.log("getSelection", document.getSelection());
-    // window.getSelection().removeAllRanges();
     console.log("keycode", event.key);
     if (event.key === "ArrowDown") {
       // change this targe to editable false, remove focus
@@ -113,14 +82,9 @@ export default function App() {
       event.target.setAttribute("contentEditable", false);
       movefocus(event.target, "up");
     }
-    // event.target.setAttribute("contentEditable", true);
   }, []);
 
   console.log(value);
-  const onSelect = (event) => {
-    // event.nativeEvent.stopImmediatePropagation();
-    // console.log("onSelectEvent");
-  };
 
   return (
     <div
@@ -128,7 +92,6 @@ export default function App() {
       onKeyUp={onKeyUp}
       onMouseDown={onMouseDown}
       onKeyDown={onKeyDown}
-      onSelect={onSelect}
       ref={wrapperRef}
       tabIndex={0}
     >
@@ -146,22 +109,15 @@ export default function App() {
   );
 }
 const movefocus = (t, direction) => {
-  console.log("t", t);
   let first = true;
-
-  // reference to the last editable
-  // help to reaching the end
+  // reference to the last editable input
   let refLastFocus = t;
 
   const recursiveSearchUp = (target) => {
-    console.log("target", target, first);
     if (target.previousSibling === null) {
-      // in case reach the end of the object , to avoid scrollin  of
+      // in case reach the end of the object , to avoid scrolling  off
       // the content
-      // refLastFocus.setAttribute("contentEditable", true);
-      // refLastFocus.focus();
-      // addSelection()
-      setTimeout(() => addSelection(refLastFocus), 50);
+      addSelection(refLastFocus);
 
       first = false;
       return;
@@ -173,10 +129,7 @@ const movefocus = (t, direction) => {
       !first
     ) {
       refLastFocus = target;
-      // console.log("finished", target.innerText);
-      // target.setAttribute("contentEditable", true);
-      // target.focus();
-      setTimeout(() => addSelection(target), 50);
+      addSelection(target);
       first = false;
       return;
     }
@@ -186,10 +139,8 @@ const movefocus = (t, direction) => {
   };
 
   const recursiveSearchDown = (target) => {
-    console.log("target", target, first);
     if (target.nextSibling === null) {
-      refLastFocus.setAttribute("contentEditable", true);
-      refLastFocus.focus();
+      addSelection(refLastFocus);
       first = false;
       return;
     }
@@ -199,12 +150,7 @@ const movefocus = (t, direction) => {
       !first
     ) {
       refLastFocus = target;
-      // target.setAttribute("contentEditable", true);
-      // target.focus();
-      // target.focus();
-      setTimeout(() => addSelection(target), 50);
-      // addSelection(target);
-      // target.focus();
+      addSelection(target);
       first = false;
       return;
     }
@@ -222,23 +168,16 @@ const movefocus = (t, direction) => {
 };
 
 const addSelection = (target) => {
-  const selection = window.getSelection();
-  // console.log("target add Selection", target);
-  // console.log("nodeType target", target.nodeType);
-  // console.log("nodeType firstChild", target.firstChild);
-  // console.log("childnodes", target.childNodes);
+  setTimeout(() => {
+    const selection = window.getSelection();
+    target.setAttribute("contentEditable", true);
+    target.focus();
 
-  target.setAttribute("contentEditable", true);
-  target.focus();
-
-  let range = new Range();
-  range.setStart(target.childNodes[0], 0);
-  range.setEnd(target.childNodes[0], 1);
-  range.selectNodeContents(target.childNodes[0]);
-  selection.removeAllRanges();
-  window.getSelection().addRange(range);
-
-  // range.selectNodeContents(rarget.childNodes[0]);
-  // document.getSelection().removeAllRanges();
-  // document.getSelection().addRange(range);
+    let range = new Range();
+    range.setStart(target.childNodes[0], 0);
+    range.setEnd(target.childNodes[0], 1);
+    range.selectNodeContents(target.childNodes[0]);
+    selection.removeAllRanges();
+    window.getSelection().addRange(range);
+  }, 50);
 };
