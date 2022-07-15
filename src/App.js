@@ -2,18 +2,14 @@ import React from "react";
 import Refractor from "react-refractor";
 import js from "refractor/lang/javascript";
 import "./prism.css";
+import "./utils.css";
+import { insertColorElement, removeColorElement } from "./utils";
 
-// import SyntaxHighlighter from "react-syntax-highlighter";
-// import SyntaxHighlighter, {
-//   registerLanguage,
-// } from 'react-syntax-highlighter/prism-light';
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-// import SyntaxHighlighter from 'react-syntax-highlighter'
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
 import style from "react-syntax-highlighter/dist/esm/styles/prism";
 import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
-// SyntaxHighlighter.rdegisterLanguage('javascript', javascript, ['js'])
 
 import { theme } from "./theme";
 
@@ -40,16 +36,32 @@ export default function App() {
   const [value, setValue] = React.useState({ path: "", value: "" });
   const wrapperRef = React.useRef(null);
 
+  React.useEffect(() => {
+    // wrapperRef.current.querySelector('#')
+  }, []);
+
   const onMouseDown = React.useCallback((event) => {
+    console.log("event", event.target);
+    console.log(
+      "inline-color",
+      event.target.className.split(" ").includes("inline-color")
+    );
+    if (event.target.className.split(" ").includes("inline-color")) {
+      return;
+    }
+
     const isEditable =
       !event.target.className.includes("property") &&
       !event.target.className.includes("string-property") &&
       !event.target.className.includes("punctuation") &&
       !event.target.className.includes("operator") &&
       !event.target.className.includes("linenumber") &&
-      !event.target.className.includes("prismjs");
+      !event.target.className.includes("prismjs") &&
+      !event.target.className.includes("inline-color-wrapper");
     if (isEditable) {
       event.target.setAttribute("contentEditable", true);
+      console.log("innertText", event.target.innerText);
+      insertColorElement(event.target);
     }
   }, []);
 
@@ -72,13 +84,19 @@ export default function App() {
     event.stopPropagation();
     console.log("keycode", event.key);
     if (event.key === "ArrowDown") {
-      // change this targe to editable false, remove focus
+      // this condition is to delete the input color in case of moving down or up
+      if (!event.target.className.split(" ").includes("inline-color-wrapper")) {
+        removeColorElement(event.target);
+      }
       event.target.setAttribute("contentEditable", false);
       movefocus(event.target, "down");
     }
 
     if (event.key === "ArrowUp") {
       // change this targe to editable false, remove focus
+      if (!event.target.className.split(" ").includes("inline-color-wrapper")) {
+        removeColorElement(event.target);
+      }
       event.target.setAttribute("contentEditable", false);
       movefocus(event.target, "up");
     }
@@ -86,12 +104,20 @@ export default function App() {
 
   console.log(value);
 
+  const onBlur = React.useCallback((event) => {
+    // remove if it not the input
+    // if (!event.target.className.split("").includes("inline-color-wrapper")) {
+    //   removeColorElement(event);
+    // }
+  }, []);
+
   return (
     <div
       className="App"
       onKeyUp={onKeyUp}
       onMouseDown={onMouseDown}
       onKeyDown={onKeyDown}
+      onBlur={onBlur}
       ref={wrapperRef}
       tabIndex={0}
     >
@@ -117,6 +143,7 @@ const movefocus = (t, direction) => {
     if (target.previousSibling === null) {
       // in case reach the end of the object , to avoid scrolling  off
       // the content
+      insertColorElement(refLastFocus);
       addSelection(refLastFocus);
 
       first = false;
@@ -129,6 +156,7 @@ const movefocus = (t, direction) => {
       !first
     ) {
       refLastFocus = target;
+      insertColorElement(target);
       addSelection(target);
       first = false;
       return;
@@ -140,6 +168,7 @@ const movefocus = (t, direction) => {
 
   const recursiveSearchDown = (target) => {
     if (target.nextSibling === null) {
+      insertColorElement(refLastFocus);
       addSelection(refLastFocus);
       first = false;
       return;
@@ -150,6 +179,7 @@ const movefocus = (t, direction) => {
       !first
     ) {
       refLastFocus = target;
+      insertColorElement(target);
       addSelection(target);
       first = false;
       return;
