@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useContext } from "react";
+import ReactDOM from "react-dom";
+import { TestContext } from "./App";
 
 const HEX_COLOR = /^#?((?:[\da-f]){3,4}|(?:[\da-f]{2}){3,4})$/i;
 
@@ -37,18 +39,23 @@ export const insertColorElement = (node) => {
   let newSpanElement = document.createElement("span");
 
   var previewElement =
-    '<span id="inputColor" contenteditable="false" class="inline-color-wrapper"><input  type="color" class="inline-color" style="background-color:' +
+    '<span id="inputColorID" contenteditable="false" class="inline-color-wrapper"><input  type="color" class="inline-color" style="background-color:' +
     prevInnerText +
     ';"></input></span>';
 
-  newSpanElement.innerHTML = previewElement;
+  // newSpanElement.innerHTML = previewElement;
 
-  // node.innerHTML = previewElement + prevInnerText;
+  // ReactDOM.render(<ColorComponent />, node);
 
-  node.innerHTML = newSpanElement.innerHTML + prevInnerText;
+  node.innerHTML = previewElement + prevInnerText;
+  //
+  // node.innerHTML = newSpanElement.innerHTML + prevInnerText;
   // console.log("Component", <ColorComponent />);
 
+  // node.innertHTML = <PortalColorComponent node={node} />;
+
   // node.innerHTML = <ColorComponent />;
+  ReactDOM.render(<PortalColorComponent />, node);
 
   console.log("node component", node);
 
@@ -56,10 +63,10 @@ export const insertColorElement = (node) => {
 
   console.log("inputColor", inputColor[0]);
 
-  inputColor[0].addEventListener("click", (event) => {
-    // event.stopPropagation();
-    // setTimeout(() => event.target.focus(), 50);
-  });
+  // inputColor[0].addEventListener("click", (event) => {
+  //   // event.stopPropagation();
+  //   // setTimeout(() => event.target.focus(), 50);
+  // });
 
   console.log("node insertColorElement", node.innerText);
 
@@ -82,6 +89,18 @@ export const isNumber = (val) => {
   return !!parseInt(val);
 };
 
+export const PortalColorComponent = () => {
+  const { testValue } = React.useContext(TestContext);
+  console.log("testValue", testValue);
+  console.log("inputColorID", document.getElementById("inputColorID"));
+  return ReactDOM.createPortal(
+    <div>hola</div>,
+    document.getElementById("inputColorID")
+  );
+};
+
 export const ColorComponent = () => {
+  const { testValue } = React.useContext(TestContext);
+  console.log("v", testValue);
   return <div>hola</div>;
 };

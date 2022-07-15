@@ -15,6 +15,8 @@ import { theme } from "./theme";
 
 let path = "";
 
+export const TestContext = React.createContext("");
+
 const getPath = (target) => {
   if (target.previousSibling === null) {
     console.log("finalPath", path);
@@ -111,27 +113,34 @@ export default function App() {
     // }
   }, []);
 
+  const [testValue, setTestValue] = React.useState(0);
+  const val = { testValue, setTestValue };
+
   return (
-    <div
-      className="App"
-      onKeyUp={onKeyUp}
-      onMouseDown={onMouseDown}
-      onKeyDown={onKeyDown}
-      onBlur={onBlur}
-      ref={wrapperRef}
-      tabIndex={0}
-    >
-      <SyntaxHighlighter
-        language="javascript"
-        useInlineStyles={false}
-        // style={vscDarkPlus}
-        // style={dracula}
-        showLineNumbers
+    <TestContext.Provider value={testValue}>
+      <div
+        id="containerCode"
+        className="App"
+        onKeyUp={onKeyUp}
+        onMouseDown={onMouseDown}
+        onKeyDown={onKeyDown}
+        onBlur={onBlur}
+        ref={wrapperRef}
+        tabIndex={0}
       >
-        {JSON.stringify(theme, 0, 2)}
-      </SyntaxHighlighter>
-      {/* <Refractor language="js" value={JSON.stringify(theme, 0, 2)} /> */}
-    </div>
+        <SyntaxHighlighter
+          language="javascript"
+          useInlineStyles={false}
+          // style={vscDarkPlus}
+          // style={dracula}
+          showLineNumbers
+        >
+          {JSON.stringify(theme, 0, 2)}
+        </SyntaxHighlighter>
+        {/* <Refractor language="js" value={JSON.stringify(theme, 0, 2)} /> */}
+        {testValue}
+      </div>
+    </TestContext.Provider>
   );
 }
 const movefocus = (t, direction) => {
