@@ -5,6 +5,7 @@
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
+    "imask": "6.4.2",
     "primjs": "0.6.5",
     "react": "18.0.0",
     "react-dom": "18.0.0",

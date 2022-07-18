@@ -4,7 +4,7 @@ import js from "refractor/lang/javascript";
 import "./prism.css";
 import "./utils.css";
 import { insertColorElement, removeColorElement } from "./utils";
-
+import IMask from "imask";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -94,8 +94,16 @@ export default function App() {
       path = "";
       // update icon color
       const inputColor = document.getElementById("inputColor");
+      console.log("val", val);
       if (inputColor) {
-        inputColor.style.background = val;
+        // console.log("inputColor", inputColor, val, val.replaceAll('"', ""));
+        var patternMask = IMask(inputColor, {
+          mask: "{#}000[aaa]/NIC-`*[**]"
+        });
+
+        console.log("patterMask", patternMask);
+        inputColor.style.backgroundColor = val.replaceAll('"', "");
+        console.log("after inputcolor", inputColor);
       }
     }
   }, []);
