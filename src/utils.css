@@ -34,3 +34,11 @@ input.inline-color {
   height: 120%;
   width: 120%;
 }
+
+input::webkit-color-swatch-wrapper {
+  display: none;
+}
+
+input::-webkit-color-swatch {
+  display: none;
+}

@@ -38,6 +38,21 @@ export default function App() {
 
   React.useEffect(() => {
     // wrapperRef.current.querySelector('#')
+    const inputColor = document.getElementById("inputColor");
+    document.addEventListener("change", (event) => {
+      event.stopPropagation();
+      //only when the input color is changed
+      if (event.target.getAttribute("id") === "inputColor") {
+        const spanColorContent = document.getElementById("currentEditing");
+        const inputColor = document.getElementById("inputColor");
+        spanColorContent.innerText = event.target.value;
+        insertColorElement(spanColorContent);
+        getPath(spanColorContent);
+        setValue({ ...{ path: path, value: event.target.value } });
+        path = "";
+      }
+      // inputColor.focus();
+    });
   }, []);
 
   const onMouseDown = React.useCallback((event) => {
@@ -77,6 +92,11 @@ export default function App() {
       getPath(event.target);
       setValue({ ...{ path: path, value: val } });
       path = "";
+      // update icon color
+      const inputColor = document.getElementById("inputColor");
+      if (inputColor) {
+        inputColor.style.background = val;
+      }
     }
   }, []);
 
@@ -89,6 +109,7 @@ export default function App() {
       if (!event.target.className.split(" ").includes("inline-color-wrapper")) {
         removeColorElement(event.target);
       }
+      removeIdElements();
       event.target.setAttribute("contentEditable", false);
       movefocus(event.target, "down");
     }
@@ -97,6 +118,8 @@ export default function App() {
       if (!event.target.className.split(" ").includes("inline-color-wrapper")) {
         removeColorElement(event.target);
       }
+      // remove id that points to input and content editable  helps to handle with useffect
+      removeIdElements();
       // change this targe to editable false, remove focus
       event.target.setAttribute("contentEditable", false);
       movefocus(event.target, "up");
@@ -224,4 +247,27 @@ const addSelection = (target) => {
     selection.removeAllRanges();
     window.getSelection().addRange(range);
   }, 50);
+};
+
+const removeIdElements = () => {
+  const spanColorContent = document.getElementById("currentEditing");
+  const inputColor = document.getElementById("inputColor");
+
+  if (spanColorContent) {
+    spanColorContent.removeAttribute("id");
+  }
+
+  if (inputColor) {
+    inputColor.removeAttribute("id");
+  }
+};
+
+const inputElement = (target) => {
+  const span = target.querySelector("span");
+  console.log("inputElement", target.childNodes, span);
+  for (const child of target.childNodes) {
+    if (child.nodeType === Node.TEXT_NODE) {
+      console.log(child.nodeValue);
+    }
+  }
 };

@@ -37,11 +37,14 @@ export const insertColorElement = (node) => {
   let newSpanElement = document.createElement("span");
 
   var previewElement =
-    '<span id="inputColor" contenteditable="false" class="inline-color-wrapper"><input  type="color" class="inline-color" style="background-color:' +
+    '<span contenteditable="false" class="inline-color-wrapper"><input  type="color" id="inputColor" class="inline-color" style="background-color:' +
     prevInnerText +
     ';"></input></span>';
 
   newSpanElement.innerHTML = previewElement;
+
+  // add className to string to reference
+  node.setAttribute("id", "currentEditing");
 
   // node.innerHTML = previewElement + prevInnerText;
 
