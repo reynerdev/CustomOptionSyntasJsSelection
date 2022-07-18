@@ -83,8 +83,9 @@ export default function App() {
   const onKeyDown = React.useCallback((event) => {
     event.stopPropagation();
     console.log("keycode", event.key);
-    if (event.key === "ArrowDown") {
+    if (event.key === "ArrowDown" || event.key === "Tab") {
       // this condition is to delete the input color in case of moving down or up
+      console.log("event.target", event.target);
       if (!event.target.className.split(" ").includes("inline-color-wrapper")) {
         removeColorElement(event.target);
       }
@@ -93,10 +94,10 @@ export default function App() {
     }
 
     if (event.key === "ArrowUp") {
-      // change this targe to editable false, remove focus
       if (!event.target.className.split(" ").includes("inline-color-wrapper")) {
         removeColorElement(event.target);
       }
+      // change this targe to editable false, remove focus
       event.target.setAttribute("contentEditable", false);
       movefocus(event.target, "up");
     }
@@ -178,8 +179,10 @@ const movefocus = (t, direction) => {
         target.className.split(" ").includes("number")) &&
       !first
     ) {
+      console.log("found target", target);
       refLastFocus = target;
       insertColorElement(target);
+      console.log("target after insert color element", target);
       addSelection(target);
       first = false;
       return;
@@ -202,11 +205,22 @@ const addSelection = (target) => {
     const selection = window.getSelection();
     target.setAttribute("contentEditable", true);
     target.focus();
+    // console.log("selection target", target.childNodes);
 
     let range = new Range();
-    range.setStart(target.childNodes[0], 0);
-    range.setEnd(target.childNodes[0], 1);
-    range.selectNodeContents(target.childNodes[0]);
+
+    // will check if has more than a childnode
+    // if has one more, it will be ainput color, otherwise a number or float
+    // todo more
+    if (target.childNodes[1]) {
+      range.selectNodeContents(target.childNodes[1]);
+    } else {
+      range.selectNodeContents(target.childNodes[0]);
+    }
+    // range.selectNodeContents(target.childNodes[1]);
+    // range.setStart(target.childNodes[1], 0);
+    // range.setEnd(target.childNodes[1], 1);
+    // range.selectNodeContents(target.childNodes[1]);
     selection.removeAllRanges();
     window.getSelection().addRange(range);
   }, 50);

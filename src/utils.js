@@ -45,7 +45,8 @@ export const insertColorElement = (node) => {
 
   // node.innerHTML = previewElement + prevInnerText;
 
-  node.innerHTML = newSpanElement.innerHTML + prevInnerText;
+  node.innerHTML = newSpanElement.innerHTML + '"' + prevInnerText + '"';
+  // node.innerHTML = newSpanElement.innerHTML + prevInnerText;
   // console.log("Component", <ColorComponent />);
 
   // node.innerHTML = <ColorComponent />;
