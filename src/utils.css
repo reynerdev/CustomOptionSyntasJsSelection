@@ -47,3 +47,23 @@ input::-webkit-color-swatch {
   outline-color: #e2d372;
   padding-right: 4px;
 }
+#inputEditable {
+  -webkit-appearance: none;
+  outline-color: #e2d372;
+  -webkit-appearance: none;
+  padding: 0px 2px;
+  margin-left: 2px;
+  border-style: none;
+  /* border-radius: 3px; */
+  font-size: 1em;
+  /* outline-offset: -2px; */
+  /* outline-offset: 1px;
+  outline-color: #e2d372; */
+  /* border: 0px; */
+  border: none;
+}
+#inputEditable:focus {
+  /* outline: 1px; */
+  outline: solid 2px #e2d372;
+  border-radius: 2px;
+}

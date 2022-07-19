@@ -105,12 +105,12 @@ pre[class*="language-"] {
   color: #690;
 }
 
-.token.selector + #inputEditing,
-.token.attr-name + #inputEditing,
-.token.string + #inputEditing,
-.token.char + #inputEditing,
-.token.builtin + #inputEditing,
-.token.inserted + #inputEditing {
+.token.selector > #inputEditable,
+.token.attr-name > #inputEditable,
+.token.string > #inputEditable,
+.token.char > #inputEditable,
+.token.builtin > #inputEditable,
+.token.inserted > #inputEditable {
   color: #690;
 }
 

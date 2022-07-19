@@ -56,11 +56,7 @@ export default function App() {
   }, []);
 
   const onMouseDown = React.useCallback((event) => {
-    console.log("event", event.target);
-    console.log(
-      "inline-color",
-      event.target.className.split(" ").includes("inline-color")
-    );
+    event.stopPropagation();
     if (event.target.className.split(" ").includes("inline-color")) {
       return;
     }
@@ -75,9 +71,17 @@ export default function App() {
       !event.target.className.includes("inline-color-wrapper");
     if (isEditable) {
       // event.target.setAttribute("contentEditable", true);
-      console.log("innertText", event.target.innerText);
-      // insertInputNextSpan(event.target);
-      insertColorElement(event.target);
+      console.log("mouseDown", event.target);
+
+      // avoid doble click if its already selected
+      console.log("document actyive lement", document.activeElement);
+      // console.log(document.activeElement.isEqualNode(event.target));
+      if (document.activeElement !== event.target) {
+        console.log("inside comparasion");
+        // event.target.setAttribute("contentEditable", true);
+        // if (document.activeElement.isEqualNode(event.target)) {
+        insertColorElement(event.target);
+      }
       // event.target.setAttribute("contentEditable", true);
     }
   }, []);
@@ -105,25 +109,24 @@ export default function App() {
 
       // update icon color
       const inputColor = document.getElementById("inputColor");
-      console.log("val", val);
       if (inputColor) {
-        // console.log("inputColor", inputColor, val, val.replaceAll('"', ""));
-
-        // console.log("patternamsk", patternMask.resolve(val).value);
-
         inputColor.style.backgroundColor = val.replaceAll('"', "");
-        console.log("after inputcolor", inputColor);
       }
     }
   }, []);
 
   const onKeyDown = React.useCallback((event) => {
     event.stopPropagation();
-    console.log("keycode", event.key);
+    console.log("event.tareget", event.target.value);
+    // restore from input to the original label
+    restoreLabel(event.target);
+    // event.target.blur();
+
     if (event.key === "ArrowDown" || event.key === "Tab") {
       // this condition is to delete the input color in case of moving down or up
       console.log("event.target", event.target);
       if (!event.target.className.split(" ").includes("inline-color-wrapper")) {
+        console.log("remove keyDown");
         removeColorElement(event.target);
       }
       removeIdElements();
@@ -146,18 +149,42 @@ export default function App() {
   console.log(value);
 
   const onBlur = React.useCallback((event) => {
+    event.stopPropagation();
     console.log("onBlur", event.target);
+    console.log("onBlur keycode", event.target.keyCode);
 
-    if (event.target.id === "inputEditable") {
-      let parentElement = event.tareget.parentElement;
-      parentElement.innertText();
-      console.log(event.target.parentElement);
-    }
+    // detect an event comming from the input editable
+    restoreLabel(event.target);
+    // if (event.target.id === "inputEditable") {
+    //   let valueInput = event.target.value;
+    //   let parentElement = event.target.parentElement;
+    //   // create text node
+    //   const text = document.createTextNode(valueInput);
+    //   event.target.remove();
+    //   // this will return the old content with a text node
+    //   parentElement.appendChild(text);
+    // }
 
     // remove if it not the input
     // if (!event.target.className.split("").includes("inline-color-wrapper")) {
     //   removeColorElement(event);
     // }
+  }, []);
+
+  const onInput = React.useCallback((event) => {
+    event.stopPropagation();
+
+    if (event.target.id === "inputEditable") {
+      event.target.style.width = event.target.value.length + "ch";
+    }
+  }, []);
+
+  const onFocus = React.useCallback((event) => {
+    event.stopPropagation();
+
+    if (event.target.id === "inputEditable") {
+      event.target.style.width = event.target.value.length + "ch";
+    }
   }, []);
 
   return (
@@ -167,6 +194,8 @@ export default function App() {
       onMouseDown={onMouseDown}
       onKeyDown={onKeyDown}
       onBlur={onBlur}
+      onInput={onInput}
+      onFocus={onFocus}
       ref={wrapperRef}
       tabIndex={0}
     >
@@ -216,7 +245,9 @@ const movefocus = (t, direction) => {
   };
 
   const recursiveSearchDown = (target) => {
+    console.log("target recursive", target);
     if (target.nextSibling === null) {
+      console.log("notfound", target);
       insertColorElement(refLastFocus);
       addSelection(refLastFocus);
       first = false;
@@ -260,11 +291,11 @@ const addSelection = (target) => {
     // will check if has more than a childnode
     // if has one more, it will be ainput color, otherwise a number or float
     // todo more
-    if (target.childNodes[1]) {
-      range.selectNodeContents(target.childNodes[1]);
-    } else {
-      range.selectNodeContents(target.childNodes[0]);
-    }
+    // if (target.childNodes[1]) {
+    //   range.selectNodeContents(target.childNodes[1]);
+    // } else {
+    //   range.selectNodeContents(target.childNodes[0]);
+    // }
     // range.selectNodeContents(target.childNodes[1]);
     // range.setStart(target.childNodes[1], 0);
     // range.setEnd(target.childNodes[1], 1);
@@ -309,4 +340,19 @@ const insertInputNextSpan = (node) => {
   input.setAttribute("id", "inputEditing");
   // node
   node.after(input);
+};
+
+const restoreLabel = (node) => {
+  if (node.tagName.toLowerCase() === "input") return;
+
+  if (node.id === "inputEditable") {
+    console.log("node", node);
+    let valueInput = node.value;
+    let parentElement = node.parentElement;
+    // create text node
+    const text = document.createTextNode(valueInput);
+    node.remove();
+    // this will return the old content with a text node
+    parentElement.appendChild(text);
+  }
 };
