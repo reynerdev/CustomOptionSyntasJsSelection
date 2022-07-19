@@ -74,9 +74,12 @@ export default function App() {
       !event.target.className.includes("prismjs") &&
       !event.target.className.includes("inline-color-wrapper");
     if (isEditable) {
-      event.target.setAttribute("contentEditable", true);
+      // event.target.setAttribute("contentEditable", true);
       console.log("innertText", event.target.innerText);
+      insertInputNextSpan(event.target);
       insertColorElement(event.target);
+      console.log("e", event.target);
+      // event.target.setAttribute("contentEditable", true);
     }
   }, []);
 
@@ -89,19 +92,26 @@ export default function App() {
       !event.target.className.includes("operator")
     ) {
       let val = event.target.innerText;
+      val = val.replaceAll('"', "");
+      var patternMask = IMask.createMask({
+        mask: "{#}******"
+      });
+      const resolvedMask = patternMask.resolve(val);
+      console.log("resolvedMask", resolvedMask);
+      event.target.innerText = resolvedMask;
+
       getPath(event.target);
       setValue({ ...{ path: path, value: val } });
       path = "";
+
       // update icon color
       const inputColor = document.getElementById("inputColor");
       console.log("val", val);
       if (inputColor) {
         // console.log("inputColor", inputColor, val, val.replaceAll('"', ""));
-        var patternMask = IMask(inputColor, {
-          mask: "{#}000[aaa]/NIC-`*[**]"
-        });
 
-        console.log("patterMask", patternMask);
+        // console.log("patternamsk", patternMask.resolve(val).value);
+
         inputColor.style.backgroundColor = val.replaceAll('"', "");
         console.log("after inputcolor", inputColor);
       }
@@ -278,4 +288,17 @@ const inputElement = (target) => {
       console.log(child.nodeValue);
     }
   }
+};
+
+const insertInputNextSpan = (node) => {
+  // event.target.setAttribute("contentEditable", true);
+  let input = document.createElement("input");
+  // save previous content
+  // let innerText = node.innertText;
+  // console.log("innerText", );
+  input.value = node.innerText;
+
+  input.setAttribute("id", "inputEditing");
+  // node
+  node.after(input);
 };

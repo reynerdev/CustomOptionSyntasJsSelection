@@ -54,19 +54,6 @@ export const insertColorElement = (node) => {
 
   // node.innerHTML = <ColorComponent />;
 
-  console.log("node component", node);
-
-  const inputColor = newSpanElement.getElementsByTagName("input");
-
-  console.log("inputColor", inputColor[0]);
-
-  inputColor[0].addEventListener("click", (event) => {
-    // event.stopPropagation();
-    // setTimeout(() => event.target.focus(), 50);
-  });
-
-  console.log("node insertColorElement", node.innerText);
-
   // return node;j
 };
 
