@@ -9,13 +9,12 @@ function validateColor(color) {
 }
 
 export const insertColorElement = (node) => {
-  const outerHtml = node.outerHTML;
   let prevInnerText = node.innerText;
 
-  console.log("outerHTML", outerHtml);
   console.log("innerText", prevInnerText);
   console.log("isNumber", isNumber(prevInnerText));
 
+  // only for string
   if (isNumber(prevInnerText)) return;
 
   // get content inside ""
@@ -30,25 +29,42 @@ export const insertColorElement = (node) => {
 
   console.log("isValidHex", isValidHex);
 
+  // if not valid hex code or color return end the function
   if (!isValidHex & !validateColor(prevInnerText)) {
     return node;
   }
 
   let newSpanElement = document.createElement("span");
+  let input = document.createElement("input");
+  input.setAttribute("id", "inputEditable");
+  // input.setAttribute("contentEditable", true);
+  input.value = prevInnerText; // add the span text in the input
 
+  // create the replace element
   var previewElement =
     '<span contenteditable="false" class="inline-color-wrapper"><input  type="color" id="inputColor" class="inline-color" style="background-color:' +
     prevInnerText +
     ';"></input></span>';
 
   newSpanElement.innerHTML = previewElement;
+  // newSpanElement.after(input);
 
   // add className to string to reference
   node.setAttribute("id", "currentEditing");
 
   // node.innerHTML = previewElement + prevInnerText;
 
-  node.innerHTML = newSpanElement.innerHTML + '"' + prevInnerText + '"';
+  node.innerHTML = newSpanElement.innerHTML; //+ '"' + prevInnerText + '"';
+  node.appendChild(input);
+
+  node.addEventListener("blur", (event) => {
+    setTimeout(() => {
+      console.log("blur", prevInnerText, event.target.innerHTML);
+      newSpanElement.remove();
+      input.remove();
+      event.target.innertText = prevInnerText;
+    }, [50]);
+  });
   // node.innerHTML = newSpanElement.innerHTML + prevInnerText;
   // console.log("Component", <ColorComponent />);
 

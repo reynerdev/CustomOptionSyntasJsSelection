@@ -76,9 +76,8 @@ export default function App() {
     if (isEditable) {
       // event.target.setAttribute("contentEditable", true);
       console.log("innertText", event.target.innerText);
-      insertInputNextSpan(event.target);
+      // insertInputNextSpan(event.target);
       insertColorElement(event.target);
-      console.log("e", event.target);
       // event.target.setAttribute("contentEditable", true);
     }
   }, []);
@@ -92,13 +91,13 @@ export default function App() {
       !event.target.className.includes("operator")
     ) {
       let val = event.target.innerText;
-      val = val.replaceAll('"', "");
-      var patternMask = IMask.createMask({
-        mask: "{#}******"
-      });
-      const resolvedMask = patternMask.resolve(val);
-      console.log("resolvedMask", resolvedMask);
-      event.target.innerText = resolvedMask;
+      // val = val.replaceAll('"', "");
+      // var patternMask = IMask.createMask({
+      //   mask: "{#}******"
+      // });
+      // const resolvedMask = patternMask.resolve(val);
+      // console.log("resolvedMask", resolvedMask);
+      // event.target.innerText = resolvedMask;
 
       getPath(event.target);
       setValue({ ...{ path: path, value: val } });
@@ -147,6 +146,14 @@ export default function App() {
   console.log(value);
 
   const onBlur = React.useCallback((event) => {
+    console.log("onBlur", event.target);
+
+    if (event.target.id === "inputEditable") {
+      let parentElement = event.tareget.parentElement;
+      parentElement.innertText();
+      console.log(event.target.parentElement);
+    }
+
     // remove if it not the input
     // if (!event.target.className.split("").includes("inline-color-wrapper")) {
     //   removeColorElement(event);
@@ -296,6 +303,7 @@ const insertInputNextSpan = (node) => {
   // save previous content
   // let innerText = node.innertText;
   // console.log("innerText", );
+  node.style.display = "none";
   input.value = node.innerText;
 
   input.setAttribute("id", "inputEditing");
