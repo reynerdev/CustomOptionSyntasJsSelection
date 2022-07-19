@@ -14,6 +14,7 @@ import { docco } from "react-syntax-highlighter/dist/esm/styles/hljs";
 import { theme } from "./theme";
 
 let path = "";
+let keyPressed;
 
 const getPath = (target) => {
   if (target.previousSibling === null) {
@@ -44,8 +45,10 @@ export default function App() {
       //only when the input color is changed
       if (event.target.getAttribute("id") === "inputColor") {
         const spanColorContent = document.getElementById("currentEditing");
-        const inputColor = document.getElementById("inputColor");
-        spanColorContent.innerText = event.target.value;
+        // const inputColor = document.getElementById("inputColor");
+        const inputEditable = document.getElementById("inputEditable");
+        console.log("inputEdtainle", inputEditable);
+        inputEditable.value = event.target.value;
         insertColorElement(spanColorContent);
         getPath(spanColorContent);
         setValue({ ...{ path: path, value: event.target.value } });
@@ -56,7 +59,13 @@ export default function App() {
   }, []);
 
   const onMouseDown = React.useCallback((event) => {
+    console.log("onMouseDown", event.target);
     event.stopPropagation();
+
+    if (event.target.id !== "inputColor") {
+      restoreLabel();
+    }
+
     if (event.target.className.split(" ").includes("inline-color")) {
       return;
     }
@@ -117,13 +126,12 @@ export default function App() {
 
   const onKeyDown = React.useCallback((event) => {
     event.stopPropagation();
+    keyPressed = true;
     console.log("event.tareget", event.target.value);
     // restore from input to the original label
-    restoreLabel(event.target);
+    restoreLabel();
     // event.target.blur();
-
     if (event.key === "ArrowDown" || event.key === "Tab") {
-      // this condition is to delete the input color in case of moving down or up
       console.log("event.target", event.target);
       if (!event.target.className.split(" ").includes("inline-color-wrapper")) {
         console.log("remove keyDown");
@@ -132,6 +140,7 @@ export default function App() {
       removeIdElements();
       event.target.setAttribute("contentEditable", false);
       movefocus(event.target, "down");
+      keyPressed = false;
     }
 
     if (event.key === "ArrowUp") {
@@ -154,7 +163,8 @@ export default function App() {
     console.log("onBlur keycode", event.target.keyCode);
 
     // detect an event comming from the input editable
-    restoreLabel(event.target);
+    // restoreLabel(event.target);
+    // removeIdElements();
     // if (event.target.id === "inputEditable") {
     //   let valueInput = event.target.value;
     //   let parentElement = event.target.parentElement;
@@ -174,6 +184,7 @@ export default function App() {
   const onInput = React.useCallback((event) => {
     event.stopPropagation();
 
+    // self ajudt width to the content
     if (event.target.id === "inputEditable") {
       event.target.style.width = event.target.value.length + "ch";
     }
@@ -342,16 +353,39 @@ const insertInputNextSpan = (node) => {
   node.after(input);
 };
 
-const restoreLabel = (node) => {
-  if (node.tagName.toLowerCase() === "input") return;
+const restoreLabel = () => {
+  // if (node.tagName.toLowerCase() === "input") return;
 
-  if (node.id === "inputEditable") {
-    console.log("node", node);
-    let valueInput = node.value;
-    let parentElement = node.parentElement;
+  console.log("restoreLabel");
+
+  const inputEditable = document.getElementById("inputEditable");
+  const colorInputWrapper = document.getElementById("inlineColorWrapper");
+
+  if (colorInputWrapper) {
+    colorInputWrapper.remove();
+  }
+
+  const spanColorContent = document.getElementById("currentEditing");
+  if (spanColorContent) {
+    spanColorContent.removeAttribute("id");
+  }
+  // console.log("inputEditable", inputEditable);
+  // if (node.id === "inputEditable") {
+  //   console.log("node", node);
+  //   let valueInput = node.value;
+  //   let parentElement = node.parentElement;
+  //   // create text node
+  //   const text = document.createTextNode(valueInput);
+  //   node.remove();
+  //   // this will return the old content with a text node
+  //   parentElement.appendChild(text);
+  // }
+  if (inputEditable) {
+    let valueInput = inputEditable.value;
+    let parentElement = inputEditable.parentElement;
     // create text node
     const text = document.createTextNode(valueInput);
-    node.remove();
+    inputEditable.remove();
     // this will return the old content with a text node
     parentElement.appendChild(text);
   }
