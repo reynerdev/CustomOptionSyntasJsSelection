@@ -46,10 +46,12 @@ export default function App() {
         const spanColorContent = document.getElementById("currentEditing");
         const inputColor = document.getElementById("inputColor");
         spanColorContent.innerText = event.target.value;
+        event.target.style.backgroundColor = event.target.value;
+        console.log("eventssss", event.target);
         insertColorElement(spanColorContent);
         getPath(spanColorContent);
         setValue({ ...{ path: path, value: event.target.value } });
-        path = "";
+        // path = "";
       }
       // inputColor.focus();
     });
@@ -57,13 +59,25 @@ export default function App() {
 
   const onMouseDown = React.useCallback((event) => {
     console.log("event", event.target);
-    console.log(
-      "inline-color",
-      event.target.className.split(" ").includes("inline-color")
-    );
+    console.log("event", event.target.innerText);
+
+    const find = findRecursiveNode(event.target, "");
+    console.log("findassss", find);
+    // return;
+    // remove current ids
+    if (
+      event.target.id !== "inlineColorWrapper" ||
+      event.target.id !== "currentEditing" ||
+      event.target.id !== ""
+    ) {
+      console.log("removeidelement");
+      // removeIdElements();
+    }
+    // avoid edting on inputcolor
     if (event.target.className.split(" ").includes("inline-color")) {
       return;
     }
+    console.log("childnode", event.target.className !== "");
 
     const isEditable =
       !event.target.className.includes("property") &&
@@ -73,7 +87,18 @@ export default function App() {
       !event.target.className.includes("linenumber") &&
       !event.target.className.includes("prismjs") &&
       !event.target.className.includes("inline-color-wrapper");
-    if (isEditable) {
+    console.log("isEditable", isEditable);
+    if (isEditable && event.target.className !== "") {
+      // check if the current target has id currentEditing, if yes do nothing
+      // if the current target doesnt have a currentEditing Id, do nothing, it will be added later
+      //
+      const nodeEditing = document.getElementById("currentEditing");
+
+      if (!event.target.isSameNode(nodeEditing)) {
+        removeIdElements();
+        removeInputColor();
+      }
+
       event.target.setAttribute("contentEditable", true);
       // console.log("mousedown", event.target.childNodes);
       // console.log("innertText", event.target.innerText);
@@ -101,9 +126,10 @@ export default function App() {
       // console.log("resolvedMask", resolvedMask);
       // event.target.innerText = resolvedMask;
 
-      getPath(event.target);
-      setValue({ ...{ path: path, value: val } });
       path = "";
+      findRecursiveNode(event.target);
+      console.log("path,setvalue", path, event.target);
+      setValue({ ...{ path: path, value: val } });
 
       // update icon color
       const inputColor = document.getElementById("inputColor");
@@ -129,6 +155,7 @@ export default function App() {
         removeColorElement(event.target);
       }
       removeIdElements();
+      removeInputColor();
       event.target.setAttribute("contentEditable", false);
       movefocus(event.target, "down");
     }
@@ -139,6 +166,7 @@ export default function App() {
       }
       // remove id that points to input and content editable  helps to handle with useffect
       removeIdElements();
+      removeInputColor();
       // change this targe to editable false, remove focus
       event.target.setAttribute("contentEditable", false);
       movefocus(event.target, "up");
@@ -155,18 +183,14 @@ export default function App() {
   }, []);
 
   return (
-    <div
-      className="App"
-      onKeyUp={onKeyUp}
-      onMouseDown={onMouseDown}
-      onKeyDown={onKeyDown}
-      onBlur={onBlur}
-      ref={wrapperRef}
-      tabIndex={0}
-    >
+    <div className="App" ref={wrapperRef} tabIndex={-1}>
       <SyntaxHighlighter
         language="javascript"
         useInlineStyles={false}
+        onKeyUp={onKeyUp}
+        onMouseDown={onMouseDown}
+        onKeyDown={onKeyDown}
+        onBlur={onBlur}
         // style={vscDarkPlus}
         // style={dracula}
         showLineNumbers
@@ -269,6 +293,7 @@ const addSelection = (target) => {
 };
 
 const removeIdElements = () => {
+  console.log("removeIdElement");
   const spanColorContent = document.getElementById("currentEditing");
   const inputColor = document.getElementById("inputColor");
 
@@ -303,3 +328,139 @@ const insertInputNextSpan = (node) => {
   // node
   node.after(input);
 };
+
+const removeInputColor = () => {
+  document.getElementById("inlineColorWrapper")?.remove();
+};
+
+const findNearestKeyParentProperty = (node) => {
+  // nearest fparent property is the one before the brackets {}
+  // 1. find the first token string-property property, (left )
+  // 2. find the first open bracket ' { ", if a close bracket is found
+  // ' } ' means that the next opened bracket ' { ' , shouldn't be taken
+  // if (node)
+
+  if (node.previousSibling === null) {
+    // nothing was found
+    return;
+  } else {
+    // if (target.className.includes)
+    // check the first
+  }
+};
+
+const findUpRecursiveByInnerText = (node, innerText, path) => {
+  console.log("findup", node, path);
+  if (node.previousSibling === null) {
+    // return null innerText hastn't been found
+    return null;
+  } else {
+    if (node.innerText === innerText) {
+      if (path === "") {
+        path = node.innertText;
+      } else {
+        path = node.innerText + "." + path;
+      }
+    }
+    findUpRecursiveByInnerText(node.previousSibling, innerText, path);
+  }
+};
+
+let leftOpenBracket = false;
+let listOpenBracket = [];
+let listCloseBracket = [];
+
+const findRecursiveNode = (node) => {
+  console.log("findup", node, node.innerText, path, leftOpenBracket);
+
+  if (node.previousSibling === null) {
+    // return null innerText hastn't been found
+    console.log("paths", path);
+    // return null;
+    path = path;
+    // return path;
+  } else {
+    if (node.innerText === "}") {
+      listCloseBracket.push("}");
+    }
+    if (node.innerText === "{") {
+      // listOpenBracket.push["{"];
+      const elementPopped = listCloseBracket.pop();
+
+      if (typeof elementPopped === "undefined") {
+        // means that the there is a left open bracket
+        leftOpenBracket = true;
+      }
+    }
+    console.log(listCloseBracket, listOpenBracket);
+
+    // if (node.innerText === "{" && hasclosebracket) {
+    //   listOpenBracket.push["{"];
+    // }
+
+    if (leftOpenBracket) {
+      if (node.className.includes("string-property")) {
+        if (path === "") {
+          path = node.innerText;
+        } else {
+          path = node.innerText + "." + path;
+        }
+        leftOpenBracket = false;
+      }
+    }
+
+    findRecursiveNode(node.previousSibling, path);
+  }
+};
+
+// const getPath = (target) => {
+//   if (target.previousSibling === null) {
+//     console.log("finalPath", path);
+//     return;
+//   } else {
+//     if (target.className.includes("string-property")) {
+//       if (path === "") {
+//         path = target.innerText;
+//       } else {
+//         path = target.innerText + "." + path;
+//       }
+//     }
+//     getPath(target.previousSibling);
+//   }
+// };
+
+// const findNodeResursive = (node , class) => {
+
+//   if (node.previousSibling === null) {
+
+//     return;
+
+//   }
+
+// }
+// const recursiveSearchUp = (target) => {
+//     if (target.previousSibling === null) {
+//       // in case reach the end of the object , to avoid scrolling  off
+//       // the content
+//       insertColorElement(refLastFocus);
+//       addSelection(refLastFocus);
+
+//       first = false;
+//       return;
+//     }
+
+//     if (
+//       (target.className.split(" ").includes("string") ||
+//         target.className.split(" ").includes("number")) &&
+//       !first
+//     ) {
+//       refLastFocus = target;
+//       insertColorElement(target);
+//       addSelection(target);
+//       first = false;
+//       return;
+//     }
+//     first = false;
+
+//     recursiveSearchUp(target.previousSibling);
+//   };

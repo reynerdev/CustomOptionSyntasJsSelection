@@ -9,7 +9,17 @@ function validateColor(color) {
 }
 
 export const insertColorElement = (node) => {
+  console.log("insertCoolorElement");
   let prevInnerText = node.innerText;
+
+  // check if previous sibling already have input color
+  console.log("np", node);
+  if (node.previousSibling?.id === "inlineColorWrapper") {
+    return;
+  } else {
+    // if not by my side but anywher else deleteo
+    // document.getElementById("inlineColorWrapper")?.remove();
+  }
 
   if (isNumber(prevInnerText)) return;
 
@@ -36,13 +46,13 @@ export const insertColorElement = (node) => {
     prevInnerText +
     ';"></input></span>';
 
-  newSpanElement.innerHTML = previewElement;
+  // newSpanElement.innerHTML = previewElement;
 
   // add className to string to reference
   node.setAttribute("id", "currentEditing");
 
   // node.innerHTML = previewElement + prevInnerText;
-  node.before(newSpanElement);
+  node.insertAdjacentHTML("beforebegin", previewElement);
 
   // node.innerHTML = newSpanElement.innerHTML + '"' + prevInnerText + '"';
   // node.innerHTML =
