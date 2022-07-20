@@ -74,9 +74,10 @@ export default function App() {
       !event.target.className.includes("prismjs") &&
       !event.target.className.includes("inline-color-wrapper");
     if (isEditable) {
-      // event.target.setAttribute("contentEditable", true);
-      console.log("innertText", event.target.innerText);
-      insertInputNextSpan(event.target);
+      event.target.setAttribute("contentEditable", true);
+      // console.log("mousedown", event.target.childNodes);
+      // console.log("innertText", event.target.innerText);
+      // insertInputNextSpan(event.target);
       insertColorElement(event.target);
       console.log("e", event.target);
       // event.target.setAttribute("contentEditable", true);
@@ -92,13 +93,13 @@ export default function App() {
       !event.target.className.includes("operator")
     ) {
       let val = event.target.innerText;
-      val = val.replaceAll('"', "");
-      var patternMask = IMask.createMask({
-        mask: "{#}******"
-      });
-      const resolvedMask = patternMask.resolve(val);
-      console.log("resolvedMask", resolvedMask);
-      event.target.innerText = resolvedMask;
+      // val = val.replaceAll('"', "");
+      // var patternMask = IMask.createMask({
+      //   mask: "{#}******"
+      // });
+      // const resolvedMask = patternMask.resolve(val);
+      // console.log("resolvedMask", resolvedMask);
+      // event.target.innerText = resolvedMask;
 
       getPath(event.target);
       setValue({ ...{ path: path, value: val } });

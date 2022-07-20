@@ -9,12 +9,7 @@ function validateColor(color) {
 }
 
 export const insertColorElement = (node) => {
-  const outerHtml = node.outerHTML;
   let prevInnerText = node.innerText;
-
-  console.log("outerHTML", outerHtml);
-  console.log("innerText", prevInnerText);
-  console.log("isNumber", isNumber(prevInnerText));
 
   if (isNumber(prevInnerText)) return;
 
@@ -37,7 +32,7 @@ export const insertColorElement = (node) => {
   let newSpanElement = document.createElement("span");
 
   var previewElement =
-    '<span contenteditable="false" class="inline-color-wrapper"><input  type="color" id="inputColor" class="inline-color" style="background-color:' +
+    '<span id="inlineColorWrapper" contenteditable="false" class="inline-color-wrapper"><input  type="color" id="inputColor" class="inline-color" style="background-color:' +
     prevInnerText +
     ';"></input></span>';
 
@@ -47,8 +42,11 @@ export const insertColorElement = (node) => {
   node.setAttribute("id", "currentEditing");
 
   // node.innerHTML = previewElement + prevInnerText;
+  node.before(newSpanElement);
 
-  node.innerHTML = newSpanElement.innerHTML + '"' + prevInnerText + '"';
+  // node.innerHTML = newSpanElement.innerHTML + '"' + prevInnerText + '"';
+  // node.innerHTML =
+  // newSpanElement.innerHTML + "<span>" + prevInnerText + "</span>";
   // node.innerHTML = newSpanElement.innerHTML + prevInnerText;
   // console.log("Component", <ColorComponent />);
 
